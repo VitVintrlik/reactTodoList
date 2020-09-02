@@ -1,8 +1,17 @@
 import React, {useState} from 'react';
-
+import Location from './location.js'
 const weatherApi = {
     key: "5f19c03a4c8370148cb0abfc7bf6ce8d",
     base: "https://api.openweathermap.org/data/2.5/"
+}
+
+window.addEventListener('load', renderOnLoad())
+
+function renderOnLoad(){
+    const onloadRender = new Location()
+    let weather = onloadRender.getLocation()
+    onloadRender.renderWeather(weather)
+
 }
 
 function App() {
@@ -11,15 +20,13 @@ function App() {
 
     const search = event => {
         if (event.key === "Enter") {
-            fetch(`${weatherApi.base}weather?q=${query}&units=metric&APPID=${weatherApi.key}`)
+            fetch(`${weatherApi.base}weather?q=${query}&units=metric&APPID=${weatherApi.key}&lang=cz`)
                 .then(response => response.json())
                 .then(weatherResult => {
                     setWeather(weatherResult)
                     setQuery('')
                     console.log(weatherResult)
                 })
-
-
         }
     }
 
@@ -32,13 +39,14 @@ function App() {
         let month = months[d.getMonth()]
         let year = d.getFullYear()
 
-        return `${day} ${date} ${month} ${year}`
+        return `${day} ${date}. ${month} ${year}`
     }
     return (
-        <div className="wrapper">
+        <div className={(typeof  weather.main !== "undefined") ? ((weather.main.temp > 16) ? 'wrapper warm' : 'wrapper') : 'wrapper' }>
             <main>
                 <div className="searchBox">
-                    <input type="text" className="searchInput" placeholder="Search..."
+                    <i className="icon"/>
+                    <input type="text" className="searchInput" placeholder="Vyhledat..."
                            onChange={event => setQuery(event.target.value)} value={query} onKeyPress={search}/>
                 </div>
                 {(typeof weather.main !== "undefined") ? (
@@ -49,10 +57,10 @@ function App() {
                         </div>
                         <div className="weatherWrapper">
                             <div className="temperature">
-                                {Math.round(weather.main.temp)}C
+                                {Math.round(weather.main.temp)}°C
                             </div>
                             <div className="weather">
-                                {weather.weather[0].main}
+                                {weather.weather[0].description}
                             </div>
                         </div>
                     </div>
