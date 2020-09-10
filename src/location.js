@@ -1,6 +1,14 @@
-import React, { Component } from "react";
+import  React, {Component} from "react";
 
 class Location extends Component {
+
+    weatherObject = {
+        weather: null,
+        name: null,
+        country: null,
+        description: null,
+        temperature: null
+    }
     weatherApi = {
         key: "5f19c03a4c8370148cb0abfc7bf6ce8d",
         base: "https://api.openweathermap.org/data/2.5/"
@@ -30,11 +38,22 @@ class Location extends Component {
         request.onreadystatechange = function () {
             if (request.readyState === 4 && request.status === 200) {
                 let data = JSON.parse(request.responseText)
-                let address = data.results[0]
-                self.getWeatherOnLoad(address.formatted_address)
+                let addressJSON = data.results[0].address_components
+                const city = self.getCityName(addressJSON)
+                self.getWeatherOnLoad(city)
             }
         }
         request.send()
+    }
+
+    getCityName(addressComponents){
+        for(const addressComponent of addressComponents) {
+            for(const type of addressComponent.types){
+                if(type === "locality" || type === "political"){
+                    return addressComponent.long_name;
+                }
+            }
+        }
     }
 
     getLocation() {
@@ -44,44 +63,52 @@ class Location extends Component {
             const longitude = position.coords.longitude;
             self.getAddress(latitude, longitude)
         }
-        let error = function (){
-            console.log("err")
+
+        let error = function (err) {
+            console.warn(`ERROR(${err.code}): ${err.message}`);
         }
         if (!navigator.geolocation) {
             alert("Geolokace neni podporovana vasim prohlizecem")
         } else {
             navigator.geolocation.getCurrentPosition(success, error)
         }
-
     }
 
-    getWeatherOnLoad(city){
+    getWeatherOnLoad(city) {
         console.log(city)
         fetch(`${this.weatherApi.base}weather?q=${city}&units=metric&APPID=${this.weatherApi.key}&lang=cz`)
-            .then(response => {
-                let json = response.json()
-                console.log( json)
-            })
+            .then(response => response.json()).then(json => {
+            this.weatherObject.weather = json
+            this.weatherObject.name = json.name
+            this.weatherObject.country = json.sys.country
+            this.weatherObject.description = json.weather[0].description
+            this.weatherObject.temperature = json.main.temp
+        })
     }
 
-    renderWeather(weather){
-        console.log(weather)
-            return (
-                <div>
-                    <div className="locationWrapper">
-                        <div className="location">{weather.name}, {weather.sys.country}</div>
-                        <div className="date">{this.dateBuilder(new Date())}</div>
+    render() {
+        console.log("rendreing")
+        this.getLocation()
+        return (
+            <div>
+                <div className="locationWrapper">
+                    <div className="location">{this.weatherObject.name}, {this.weatherObject.country}</div>
+                    <div className="date">{this.dateBuilder(new Date())}</div>
+                </div>
+                <div className="weatherWrapper">
+                    <div className="temperature">
+                        {Math.round(this.weatherObject.temperature)}°C
                     </div>
-                    <div className="weatherWrapper">
-                        <div className="temperature">
-                            {Math.round(weather.main.temp)}°C
-                        </div>
-                        <div className="weather">
-                            {weather.weather[0].description}
-                        </div>
+                    <div className="weather">
+                        {this.weatherObject.description}
                     </div>
                 </div>
-            )
+            </div>
+        )
     }
+
 }
+
 export default Location;
+
+

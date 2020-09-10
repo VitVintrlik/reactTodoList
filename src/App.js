@@ -1,17 +1,9 @@
 import React, {useState} from 'react';
 import Location from './location.js'
+
 const weatherApi = {
     key: "5f19c03a4c8370148cb0abfc7bf6ce8d",
     base: "https://api.openweathermap.org/data/2.5/"
-}
-
-window.addEventListener('load', renderOnLoad())
-
-function renderOnLoad(){
-    const onloadRender = new Location()
-    let weather = onloadRender.getLocation()
-    onloadRender.renderWeather(weather)
-
 }
 
 function App() {
@@ -25,7 +17,6 @@ function App() {
                 .then(weatherResult => {
                     setWeather(weatherResult)
                     setQuery('')
-                    console.log(weatherResult)
                 })
         }
     }
@@ -49,6 +40,7 @@ function App() {
                     <input type="text" className="searchInput" placeholder="Vyhledat..."
                            onChange={event => setQuery(event.target.value)} value={query} onKeyPress={search}/>
                 </div>
+                <Location/>
                 {(typeof weather.main !== "undefined") ? (
                     <div>
                         <div className="locationWrapper">
