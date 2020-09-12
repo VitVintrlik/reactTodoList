@@ -9,16 +9,23 @@ body {
 }
 
 .wrapper {
-  background-image: url('./images/coldBackground.jpg');
   background-size: cover;
   background-position: bottom;
   transition: 0.4s ease;
 }
 
-.wrapper.warm {
-  background-image: url('./images/warmBackground.jpg');
+.winter{
+  background-image: url('./images/winterBackground.jpg');
 }
-
+.spring{
+  background-image: url('./images/springBackground.jpg');
+}
+.summer{
+  background-image: url('./images/summerBackground.jpg');
+}
+.fall{
+  background-image: url('./images/fallBackground.jpg');
+}
 main {
   min-height: 100vh;
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.75));
@@ -71,7 +78,7 @@ main {
   text-align: center;
 }
 
-.weatherWrapper .temperature {
+.weatherWrapper .weatherInfoContainer {
   position: relative;
   display: inline-block;
   margin: 30px auto;
@@ -84,6 +91,7 @@ main {
   text-shadow: 3px 6px rgba(50, 50, 70, 0.5);
   text-align: center;
   box-shadow: 3px 6px rgba(0, 0, 0, 0.2);
+  width: 60%;
 }
 
 .weatherWrapper .weather {
@@ -93,15 +101,16 @@ main {
   text-shadow: 3px 3px rgba(50, 50, 70, 0.5);
 }
 
-/*
-.icon{
-  position: absolute;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfkCQIQBgs7toSwAAABE0lEQVQoz3XRPS+DARiF4eutRiR+gHa1Gxo1WSQMDSmJSkhpjAwVC7+ik6jEYCti0ESIMFTSiUFpxGQwawdjRWKooR/awRmfcz/LfQLd7MIMSuS616CvHnasKaPxhwTdMmLVvBiqLp2otaCgXY85MOpaBXFz3mW9khPW+s4btOBZE0fG5e1bUWNgFzYkrHsyZcesL/debPryMCmMYUk3KqacimJRWtmtpEONkBkFMRWkREFUCo9iCqZD/ktbQEhJRlUcRR/gQxFxVRl3YTRc2RZXlraEc2UTEvY0Oh4izgzJetJEYFzet2X1joeaLXkXbVETZr3LqverHrHWo/pYvau6b6wC/WMNdIB7k/z49Oitd+5fw8VURiF4C3UAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjAtMDktMDJUMTY6MDY6MTEtMDQ6MDBWbe/AAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIwLTA5LTAyVDE2OjA2OjExLTA0OjAwJzBXfAAAAABJRU5ErkJggg==);
-  background-repeat: no-repeat;
-  width: 50px;
-  height: 50px;
-  float: right;
-  margin: 17px 17px 17px 93%;
+.humidity{
+  font-size: 50px;
 }
-*/
+
+.wind{
+  font-size: 50px;
+}
+
+.timeContainer{
+  font-size: 50px;
+}
+
 

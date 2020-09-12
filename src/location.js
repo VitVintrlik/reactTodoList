@@ -1,4 +1,4 @@
-import  React, {Component, useState} from "react";
+import React, {Component} from "react";
 
 class Location extends Component {
     weatherApi = {
@@ -13,10 +13,38 @@ class Location extends Component {
             name: null,
             country: null,
             description: null,
-            temperature: null
+            temperature: null,
+            wind: null,
+            humidity: null,
+            sunrise: null,
+            sunset: null
         }
+    }
+
+    componentDidMount() {
         this.getLocation()
     }
+
+    searchValue(){
+
+    }
+
+    changeState(json) {
+        console.log("stateUpdate")
+        this.setState({
+            weather: json,
+            name: json.name,
+            country: json.sys.country,
+            description: json.weather[0].description,
+            temperature: json.main.temp,
+            wind: json.wind.speed,
+            humidity: json.main.humidity,
+            sunrise: json.sys.sunrise,
+            sunset: json.sys.sunset
+        })
+        console.log(this.state)
+    }
+
     dateBuilder = (d) => {
         let months = ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červecen", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"]
         let days = ["Sobota", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Neděle"]
@@ -49,10 +77,10 @@ class Location extends Component {
         request.send()
     }
 
-    getCityName(addressComponents){
-        for(const addressComponent of addressComponents) {
-            for(const type of addressComponent.types){
-                if(type === "locality" || type === "political"){
+    getCityName(addressComponents) {
+        for (const addressComponent of addressComponents) {
+            for (const type of addressComponent.types) {
+                if (type === "locality" || type === "political") {
                     return addressComponent.long_name;
                 }
             }
@@ -78,44 +106,66 @@ class Location extends Component {
     }
 
     getWeatherOnLoad(city) {
-        console.log(city)
         fetch(`${this.weatherApi.base}weather?q=${city}&units=metric&APPID=${this.weatherApi.key}&lang=cz`)
             .then(response => response.json()).then(json => {
-                this.setState({
-                    weather: json,
-                    name: json.name,
-                    country: json.sys.country,
-                    description: json.weather[0].description,
-                    temperature: json.main.temp
-                })
-            console.log("cityLoad")
+            this.changeState(json)
         })
     }
 
+    calculateTime(timeInt) {
+        const newDate = new Date(timeInt)
+        return newDate.getHours() + ":" + newDate.getMinutes()
+    }
 
+    speedUnitConvert(mps) {
+        return Math.round(mps * 3.6);
+    }
 
+    search = event => {
+        if (event.key === "Enter") {
+            const query = document.getElementsByClassName("searchInput")[0].value
+            fetch(`${this.weatherApi.base}weather?q=${query}&units=metric&APPID=${this.weatherApi.key}&lang=cz`)
+                .then(response => response.json())
+                .then(weatherResult => {
+                    this.changeState(weatherResult)
+                })
+        }
+    }
 
     render() {
-
         console.log("rendering")
         return (
-            <div>
-                <div className="locationWrapper">
-                    <div className="location">{this.state.name}, {this.state.country}</div>
-                    <div className="date">{this.dateBuilder(new Date())}</div>
+            <>
+                <div className="searchBox">
+                    <i className="icon"/>
+                    <input type="text" className="searchInput" placeholder="Vyhledat..."
+                         onKeyPress={this.search}/>
                 </div>
-                <div className="weatherWrapper">
-                    <div className="temperature">
-                        {Math.round(this.state.temperature)}°C
+                <div>
+                    <div className="locationWrapper">
+                        <div className="location">{this.state.name}, {this.state.country}</div>
+                        <div className="date">{this.dateBuilder(new Date())}</div>
                     </div>
-                    <div className="weather">
-                        {this.state.description}
+                    <div className="weatherWrapper">
+                        <div className="weatherInfoContainer">
+                            <span
+                                className="temperature">{Math.round(this.state.temperature)}°C {this.state.description}</span><br/>
+                            <span className="humidity">Vlhkost vzduchu: {this.state.humidity}%</span><br/>
+                            <span
+                                className="wind">Rychlost vetru: {this.speedUnitConvert(this.state.wind)}km/h</span><br/>
+                            <div className="timeContainer">
+                                <span className="sunrise">Vychod slunce: {this.calculateTime(this.state.sunrise)}</span>
+                                <span className="sunrise">Zapad slunce: {this.calculateTime(this.state.sunset)}</span>
+                            </div>
+                            <br/>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </>
         )
     }
 }
+
 
 export default Location;
 
