@@ -110,6 +110,11 @@ main {
 }
 
 .timeContainer{
+  display: inline-grid;
+  font-size: 50px;
+}
+
+.nonexistent{
   font-size: 50px;
 }
 

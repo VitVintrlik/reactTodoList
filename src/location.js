@@ -5,32 +5,33 @@ class Location extends Component {
         key: "5f19c03a4c8370148cb0abfc7bf6ce8d",
         base: "https://api.openweathermap.org/data/2.5/"
     }
+    initialState = {
+        weather: null,
+        name: null,
+        country: null,
+        description: null,
+        temperature: null,
+        wind: null,
+        humidity: null,
+        sunrise: null,
+        sunset: null
+    }
 
     constructor() {
         super();
-        this.state = {
-            weather: null,
-            name: null,
-            country: null,
-            description: null,
-            temperature: null,
-            wind: null,
-            humidity: null,
-            sunrise: null,
-            sunset: null
-        }
+        this.state = this.initialState
     }
+
 
     componentDidMount() {
         this.getLocation()
     }
 
-    searchValue(){
-
+    resetState() {
+        this.setState(this.initialState)
     }
 
     changeState(json) {
-        console.log("stateUpdate")
         this.setState({
             weather: json,
             name: json.name,
@@ -42,7 +43,6 @@ class Location extends Component {
             sunrise: json.sys.sunrise,
             sunset: json.sys.sunset
         })
-        console.log(this.state)
     }
 
     dateBuilder = (d) => {
@@ -113,12 +113,16 @@ class Location extends Component {
     }
 
     calculateTime(timeInt) {
-        const newDate = new Date(timeInt)
+        const newDate =  new Date(timeInt * 1000)
         return newDate.getHours() + ":" + newDate.getMinutes()
     }
 
     speedUnitConvert(mps) {
         return Math.round(mps * 3.6);
+    }
+
+    firstLetterCapital(string){
+        return string.charAt(0).toUpperCase() + string.slice(1)
     }
 
     search = event => {
@@ -127,7 +131,11 @@ class Location extends Component {
             fetch(`${this.weatherApi.base}weather?q=${query}&units=metric&APPID=${this.weatherApi.key}&lang=cz`)
                 .then(response => response.json())
                 .then(weatherResult => {
-                    this.changeState(weatherResult)
+                    if (weatherResult.cod !== "404") {
+                        this.changeState(weatherResult)
+                    } else {
+                        this.resetState()
+                    }
                 })
         }
     }
@@ -139,27 +147,41 @@ class Location extends Component {
                 <div className="searchBox">
                     <i className="icon"/>
                     <input type="text" className="searchInput" placeholder="Vyhledat..."
-                         onKeyPress={this.search}/>
+                           onKeyPress={this.search}/>
                 </div>
                 <div>
-                    <div className="locationWrapper">
-                        <div className="location">{this.state.name}, {this.state.country}</div>
-                        <div className="date">{this.dateBuilder(new Date())}</div>
-                    </div>
-                    <div className="weatherWrapper">
-                        <div className="weatherInfoContainer">
-                            <span
-                                className="temperature">{Math.round(this.state.temperature)}°C {this.state.description}</span><br/>
-                            <span className="humidity">Vlhkost vzduchu: {this.state.humidity}%</span><br/>
-                            <span
-                                className="wind">Rychlost vetru: {this.speedUnitConvert(this.state.wind)}km/h</span><br/>
-                            <div className="timeContainer">
-                                <span className="sunrise">Vychod slunce: {this.calculateTime(this.state.sunrise)}</span>
-                                <span className="sunrise">Zapad slunce: {this.calculateTime(this.state.sunset)}</span>
+                    {(this.state.name) ? (
+                        <>
+                            <div className="locationWrapper">
+                                <div className="location">{this.state.name}, {this.state.country}</div>
+                                <div className="date">{this.dateBuilder(new Date())}</div>
                             </div>
-                            <br/>
-                        </div>
-                    </div>
+                            <div className="weatherWrapper">
+                                <div className="weatherInfoContainer">
+                            <span
+                                className="temperature">{Math.round(this.state.temperature)}°C {this.firstLetterCapital(this.state.description)}</span><br/>
+                                    <span className="humidity">Vlhkost vzduchu: {this.state.humidity}%</span><br/>
+                                    <span
+                                        className="wind">Rychlost vetru: {this.speedUnitConvert(this.state.wind)}km/h</span><br/>
+                                    <div className="timeContainer">
+                                        <span
+                                            className="sunrise">Vychod slunce: {this.calculateTime(this.state.sunrise)}</span>
+                                        <span
+                                            className="sunrise">Zapad slunce: {this.calculateTime(this.state.sunset)}</span>
+                                    </div>
+                                    <br/>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="weatherWrapper">
+                                <div className="weatherInfoContainer nonexistent">
+                                    Zadané město neexistuje
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </>
         )
